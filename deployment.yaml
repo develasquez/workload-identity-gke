@@ -19,8 +19,8 @@ spec:
       serviceAccountName: {SA_NAME}
       containers:
       - env:
-        name: STORAGE_NAME
-        value: {PROJECT_ID}-bucket
+        - name: STORAGE_NAME
+          value: {PROJECT_ID}-bucket
         image: gcr.io/{PROJECT_ID}/servicio:{TEMPLATE_VERSION}
         imagePullPolicy: Always
         

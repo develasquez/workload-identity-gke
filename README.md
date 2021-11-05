@@ -75,6 +75,8 @@ To test the workload identity configuration you could clone this git project and
 
 ```sh
 git clone https://github.com/develasquez/workload-identity-gke.git
+
+cd workload-identity-gke
 ```
 
 To reference the service account to your Pod you must to add the next value in the deployment yaml file
@@ -83,6 +85,14 @@ To reference the service account to your Pod you must to add the next value in t
     spec:
       serviceAccountName: gcs-service
 ```
+To test this application we need to create a bucket and a file inside.
+
+```sh
+gsutil mb gs://$PROJECT_ID-bucket;
+echo "Reading files thanks to Workload Identity on $PROJECT_ID" > data.txt;
+gsutil cp data.txt gs://$PROJECT_ID-bucket;
+```
+
 
 You cloud deploy this application to your cluster run the follow command
 
@@ -90,3 +100,22 @@ You cloud deploy this application to your cluster run the follow command
 ./deploy.sh $PROJECT_ID $RANDOM $SA_NAME
 ```
 
+Until your app was deployed you coud test it with a curl using the LoadBalancer Ingress IP
+
+```sh
+kubectl describe service lb
+curl http://<LoadBalancerIP>
+```
+As you can see, your pod doen't have access to your bucket, because we need to add the right permisions to the service account in IAM
+
+```sh
+gcloud projects add-iam-policy-binding $PROJECT_ID \
+--member serviceAccount:$SA_NAME@$PROJECT_ID.iam.gserviceaccount.com \
+--role roles/storage.objectViewer
+```
+
+Now test your app again
+
+```sh
+curl http://<LoadBalancerIP>
+```
