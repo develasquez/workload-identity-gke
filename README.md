@@ -1,3 +1,17 @@
+# This is not an official Google project.
+
+This script is for educational purposes only, is not certified and is not recommended for production environments.
+
+## Copyright 2021 Google LLC
+Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License. You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software distributed under the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the License for the specific language governing permissions and limitations under the License.
+
+---
+
+
+
 # Workload Identity Demo
 
 This guide will hel you to undestand how to implement Workload Identity with your Kubernetes cluster and how to set your deployment configuratio to use a kubernetes service account linked to a IAM service account to perform operation with Google Cloud resources
@@ -13,19 +27,20 @@ export PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 To create your cluster attached to your project identity fleet you need to set the workload pool attribute with this flag.
 
 ```sh
-    --workload-pool=$PROJECT_ID.svc.id.goog
+--workload-pool=$PROJECT_ID.svc.id.goog
 ```
 
 Create your private cluster with this command, note that this cluster will be attached to a workload pool.
 
 ```sh
 gcloud beta container clusters create "k8s" \
---region us-central1 \
+--zone us-central1-a \
 --enable-private-nodes \
 --enable-ip-alias \
 --master-ipv4-cidr "172.16.0.0/28" \
 --workload-pool=$PROJECT_ID.svc.id.goog
 ```
+If you inspect your cluster configurartion you will find the reference to the Workload Identity Pool
 
 ## Setup IAM and Kubernetes sevice accounts
 
@@ -42,12 +57,14 @@ gcloud iam service-accounts create $SA_NAME
 Next we need to connect to the cluster and create a kubernetes service account
 
 ```sh
-gcloud container clusters get-credentials k8s --region us-central1 --project $PROJECT_ID
+# connect to your cluster
+gcloud container clusters get-credentials k8s --zone us-central1-a --project $PROJECT_ID
 
+#Register your ip address as master authorized admin
 gcloud container clusters update "k8s" \
     --enable-master-authorized-networks \
     --master-authorized-networks $MY_IP/32 \
-    --region us-central1
+    --zone us-central1-a
 
 kubectl create serviceaccount --namespace $NAMESPACE $SA_NAME
 ```
@@ -114,7 +131,7 @@ gcloud projects add-iam-policy-binding $PROJECT_ID \
 --role roles/storage.objectViewer
 ```
 
-Now test your app again
+Wait few minutes and test your app again
 
 ```sh
 curl http://<LoadBalancerIP>
