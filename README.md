@@ -14,7 +14,18 @@ Unless required by applicable law or agreed to in writing, software distributed 
 
 # Workload Identity Demo
 
-This guide will hel you to undestand how to implement Workload Identity with your Kubernetes cluster and how to set your deployment configuratio to use a kubernetes service account linked to a IAM service account to perform operation with Google Cloud resources
+This guide will help you to undestand how to implement Workload Identity with your Kubernetes cluster and how to set your deployment configuration to use a kubernetes service account linked to a IAM service account to perform operation with Google Cloud resources
+
+![diagram](./workload_identity.png)
+
+### Steps to make Workload Identity works
+
++ 1) [Create a Cloud IAM service account](#setup-iam-and-kubernetes-sevice-accounts)
++ 2) Add the iam.workloadIdentityUser role with the member value as $PROJECT_ID.svc.id.goog[$NAMESPACE/$SA_NAME]
++ 3) Create a kubernetes service account
++ 4) Create an annotation in the k8s service account with the reference to cloud IAM and to the service account
++ 5) GKE will automatically create a secret and inject 
+
 
 ## Set vars
 
@@ -68,6 +79,7 @@ gcloud container clusters update "k8s" \
 
 kubectl create serviceaccount --namespace $NAMESPACE $SA_NAME
 ```
+### Create an annotation in the k8s service account
 
 With the next command we will set a reference from the kubernetes service account to the IAM service account
 
@@ -76,6 +88,8 @@ kubectl annotate serviceaccount \
 --namespace $NAMESPACE $SA_NAME \
 iam.gke.io/gcp-service-account=$SA_NAME@$PROJECT_ID.iam.gserviceaccount.com
 ```
+
+### Add role workloadIdentityUser to IAM Service Account
 
 finaly we neewd to add the **workloadIdentityUser** role to the IAM service account and set the memeber attribute with the workload pool name and the Namespace and Kubernetes Service Account name reference
 
