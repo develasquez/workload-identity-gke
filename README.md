@@ -21,9 +21,9 @@ This guide will help you to undestand how to implement Workload Identity with yo
 ### Steps to make Workload Identity works
 
 + 1) [Create a Cloud IAM service account](#setup-iam-and-kubernetes-sevice-accounts)
-+ 2) Add the iam.workloadIdentityUser role with the member value as $PROJECT_ID.svc.id.goog[$NAMESPACE/$SA_NAME]
-+ 3) Create a kubernetes service account
-+ 4) Create an annotation in the k8s service account with the reference to cloud IAM and to the service account
++ 2) [Add the iam.workloadIdentityUser role with the member value as $PROJECT_ID.svc.id.goog[$NAMESPACE/$SA_NAME]](#add-role-workloadidentityuser-to-iam-service-account)
++ 3) [Create a kubernetes service account](#setup-iam-and-kubernetes-sevice-accounts)
++ 4) [Create an annotation in the k8s service account with the reference to cloud IAM and to the service account](#create-an-annotation-in-the-k8s-service-account)
 + 5) GKE will automatically create a secret and inject 
 
 
